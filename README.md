@@ -9,13 +9,15 @@ I made this config starting first in a VM before i proceeded to spend hours conf
 im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using Nix Modules over Docker Containers in this config where I can.
 <br>
 <br>
-### list of services
-*Nix Modules*
+
+### list of services 
+
+ ***Nix Modules***
 - pihole <br>
 - copyparty <br>
 - vaultwarden <br>
 
-*Docker Containers*
+***Docker Containers***
 - arcane
 (mostly for managing containers on arcane agents on other machines) <br>
 May add more later <br>
