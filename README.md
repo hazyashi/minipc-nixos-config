@@ -11,7 +11,8 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 - copyparty <br>
 - vaultwarden <br>
 <br>
-*Docker Containers* <br>
+*Docker Containers*
+<br>
 - arcane (mostly for managing containers on arcane agents on other machines) <br>
 May add more later <br>
 <br>
