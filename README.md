@@ -1,5 +1,9 @@
 # minipc-nixos-config
-nixos config for my little hp prodesk mini pc for my homelab <br>
+nixos config for my little hp prodesk mini pc for my homelab 
+<br>
+
+<img width="1368" height="504" alt="image" src="https://github.com/user-attachments/assets/92dcdf2e-7ec9-4d09-b83d-d7bc998ac640" />
+
 <br>
 I made this config starting first in a VM before i proceeded to spend hours configuring the system. At the moment this is a very basic config meant to run a couple self hosted services for my homelab on a tiny mini pc with 4gb of ram. There is no home manager or nix flakes as I haven't learned those yet. <br>
 im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using Nix Modules over Docker Containers in this config where I can.
