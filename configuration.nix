@@ -18,12 +18,17 @@
       ./compose/arcane/docker-compose.nix # Docker Manager for managing containers on other Agents.
      ];
 
+  # Bootloader stuff on the real hp prodesk hardware
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  
+  # All this bootloader stuff down here was from when this nix config was on a VM, do NOT uncomment it
   # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/vda"; # Change this on different host machines
-  boot.loader.grub.useOSProber = true;
+  # boot.loader.grub.enable = true;
+  # boot.loader.grub.device = "/dev/vda"; # Change this on different host machines
+  # boot.loader.grub.useOSProber = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "wisteria"; # Define your hostname.
   networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -118,6 +123,7 @@
     dig
     host
     busybox
+    ethtool
     compose2nix
     docker-compose
 
@@ -139,6 +145,7 @@
   # tailscale config
   services.tailscale = {
       enable = true;
+      useRoutingFeatures = "server";
       interfaceName = "tailscale0";
       extraUpFlags = [
            "--accept-routes=true"
@@ -146,12 +153,28 @@
            "--accept-dns=true"
       ];
     };
+  # Tailscale Subnet Routing Optimizations here
+  systemd.services.tailscale-udp-optimizations = {
+  description = "Configure UDP GRO forwarding for Tailscale";
+  wantedBy = [ "multi-user.target" ];
+  after = [ "network-online.target" ];
+  wants = [ "network-online.target" ];
+  serviceConfig = {
+    Type = "oneshot";
+    RemainAfterExit = true;
+  };
+  path = [ pkgs.iproute2 pkgs.ethtool ];
+  script = ''
+    NETDEV=$(ip -o route get 8.8.8.8 | cut -f 5 -d " ")
+    ethtool -K "$NETDEV" rx-udp-gro-forwarding on rx-gro-list off
+  '';
+};
 
 
   # Networking here !!
   # Open ports in the firewall.
-   networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 3552 3553 3923 10350 ];
-   networking.firewall.allowedUDPPorts = [ 53 22 ];
+  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 3552 3553 3923 10350 ];
+  networking.firewall.allowedUDPPorts = [ 53 22 ];
   # Or to disable the firewall altogether, uncomment the below !
   # networking.firewall.enable = false;
  
@@ -185,7 +208,7 @@
       # Syntax: "true,IP Range,MagicDNS Server,Tailnet Domain". Conditional Forwarding rule, useful for adblock across a tailnet
       revServers = [
         # Uncomment the below and replace the tailnet name with a real one
-        # "true,100.64.0.0/10,100.100.100.100,tailnet_name_here.ts.net"
+        "true,100.64.0.0/10,100.100.100.100,bun-pride.ts.net"
        ];
       };
 
