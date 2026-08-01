@@ -6,11 +6,11 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 <br>
 <br>
 ### list of services
-* *Nix Modules* *
+*Nix Modules*
 - pihole <br>
 - copyparty <br>
 - vaultwarden <br>
-* *Docker Containers* *
+*Docker Containers*
 - arcane (mostly for managing containers on arcane agents on other machines) <br>
 May add more later <br>
 <br>
