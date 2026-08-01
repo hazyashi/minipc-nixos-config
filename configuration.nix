@@ -14,8 +14,11 @@
       # Copyparty Nix Module
       ./modules/copyparty.nix
     
-      # Compose2nix projects 
-      ./compose/arcane/docker-compose.nix # Docker Manager for managing containers on other Agents.
+      # Compose2nix Containers
+      # Arcane
+      ./compose/arcane/docker-compose.nix
+      # Home Assistant
+      # ./compose/home-assistant/docker-compose.nix # Keeping Home Assistant commented out as i have no need for it at this moment 
 
       # Keeping Home Manager commented out cause its kinda just bloat to me on a headless server
       # inputs.home-manager.nixosModules.default
@@ -131,18 +134,23 @@
   # Functional system nix packages here !!
     wget
     git
-    helix
     kitty
     tmux
     starship
-    yt-dlp
     curl
     dig
     host
     busybox
     ethtool
+  # Cli's !!
+    yt-dlp
     compose2nix
     docker-compose
+  # Tui's !!
+    helix
+    glow
+    tray-tui
+    tuios
   # self hosted services nix modules here !!
     copyparty 
     pihole-ftl
@@ -189,7 +197,7 @@
 
   # Networking here !!
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 3552 3553 3923 10350 ];
+  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8123 3552 3553 3923 10350 ];
   networking.firewall.allowedUDPPorts = [ 53 22 ];
   # Or to disable the firewall altogether, uncomment the below !
   # networking.firewall.enable = false;
