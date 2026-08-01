@@ -10,10 +10,10 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 - pihole <br>
 - copyparty <br>
 - vaultwarden <br>
-<br>
-*Docker Containers*
-<br>
-- arcane (mostly for managing containers on arcane agents on other machines) <br>
+
+* Docker Containers *
+- arcane
+(mostly for managing containers on arcane agents on other machines) <br>
 May add more later <br>
 <br>
 I want to get pretty much everything on this system to be declarative and reproducible using config files in "/etc/nixos" and running "nixos-rebuild switch". I used compose2nix to make docker compose also able to bring up containers with a nixos-rebuild.
