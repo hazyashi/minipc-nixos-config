@@ -20,9 +20,13 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 
 ***Docker Containers***
 - arcane <br>
-<br>
+
 I want to get pretty much everything about the system and the services ran to be reproducile with this git repo
 using config files in "/etc/nixos" and running "nixos-rebuild switch".
 I used compose2nix to make docker compose also able to bring up containers with a nixos-rebuild.
 <br>
-I tried using home manager but I don't have a need for it on a headless server where it would overcomplicate & bloat the /nix/store and just make more configs to write. If i want to back up user configs, I will make symlinks from ~/.config to a directory in this repo
+I tried using home manager but I don't have a need for it on a headless server
+where it would overcomplicate things & bloat the /nix/store and just make more configs to write.
+(I only barely grasp how flakes work to)
+<br>
+If i want to back up user configs, I will make symlinks from ~/.config to a directory in this repo
