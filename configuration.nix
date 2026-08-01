@@ -4,18 +4,21 @@
 
 # larping i got no idea what im doing help
 
-{ config, pkgs, lib, ... }: {
+{ config, pkgs, inputs, lib, ... }: {
 
   imports =
     [ # Include the results of the hardware scan.
       # make sure to use .gitignore on this when transfering /etc/nixos to other machines
       ./hardware-configuration.nix
 
-      # Copyparty Nix Module Path
-      ./copyparty.nix
+      # Copyparty Nix Module
+      ./modules/copyparty.nix
     
       # Compose2nix projects 
       ./compose/arcane/docker-compose.nix # Docker Manager for managing containers on other Agents.
+
+      # Keeping Home Manager commented out cause its kinda just bloat to me on a headless server
+      # inputs.home-manager.nixosModules.default
      ];
 
   # Bootloader stuff on the real hp prodesk hardware
@@ -38,20 +41,27 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Optimizations for the tiny pathetic 4gb ram pc lmao
   zramSwap.enable = true;
-  nix.gc = {
-   automatic = true;
-   dates = "weekly";
-   options = "--delete-older-than 14d";
-  }; 
+  # nix.gc = {
+  #  automatic = true;
+  # dates = "weekly";
+  # options = "--delete-older-than 14d";
+  # };
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "/etc/nixos"; # sets NH_OS_FLAKE variable for you
+  };
+     
   nix.settings = {
    cores = 2;
    max-jobs = 1;
    auto-optimise-store = true;
   };
-  
-
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
@@ -93,13 +103,20 @@
      ];
   };
 
-
   # source ~/.bashrc on user login, no idea why its not like this by default  
      programs.bash.interactiveShellInit = ''
      if [ -f "$HOME/.bashrc" ]; then
        . "$HOME/.bashrc"
      fi
    '';
+
+  # home-manager = {
+  # will pass inputs to the home manager module
+  #  extraSpecialArgs = { inherit inputs; };
+  #  users = {
+  #    "ashi" = import ./home.nix;
+  #  };
+  # };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -108,8 +125,8 @@
   # $ nix search wget
 
   environment.systemPackages = with pkgs; [
-   # i hate vim and im leaving it commented
-   # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  # i hate vim and im leaving it commented
+  # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
 
   # Functional system nix packages here !!
     wget
@@ -126,7 +143,6 @@
     ethtool
     compose2nix
     docker-compose
-
   # self hosted services nix modules here !!
     copyparty 
     pihole-ftl
@@ -148,9 +164,9 @@
       useRoutingFeatures = "server";
       interfaceName = "tailscale0";
       extraUpFlags = [
-           "--accept-routes=true"
-           "--ssh=true"
-           "--accept-dns=true"
+         "--accept-routes=true"
+         "--ssh=true"
+         "--accept-dns=true"
       ];
     };
   # Tailscale Subnet Routing Optimizations here
