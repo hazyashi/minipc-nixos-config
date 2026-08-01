@@ -246,6 +246,11 @@
     database.network.expire = 30;
     };
   };
+    # Pihole Password is stored in this enviroment variable, contents of it should be
+    # FTLCONF_webserver_api_password="password"
+    systemd.services.pihole-ftl.serviceConfig.EnvironmentFile = "/var/lib/pihole/pihole-secrets.env";
+    systemd.services.pihole-ftl.serviceConfig.PrivateNetwork = false;
+    
     services.pihole-web = {
     enable = true;
     ports = [ "8080" ];
