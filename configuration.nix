@@ -14,7 +14,7 @@
       # Copyparty Nix Module
       ./modules/copyparty.nix
     
-      # Compose2nix Containers
+      # Compose2nix Containers below
       # Arcane
       ./compose/arcane/docker-compose.nix
       # Home Assistant
@@ -133,7 +133,6 @@
 
   # Functional system nix packages here !!
     wget
-    git
     kitty
     tmux
     starship
@@ -143,6 +142,7 @@
     busybox
     ethtool
   # Cli's !!
+    git
     yt-dlp
     compose2nix
     docker-compose
@@ -155,8 +155,9 @@
     copyparty 
     pihole-ftl
     vaultwarden
-    
-]; # end bracket of system packages
+    microbin
+      
+];# end bracket of system packages
  
   # !! MAIN STUFF !!
   # some important system stuff
@@ -194,23 +195,19 @@
   '';
 };
 
-
   # Networking here !!
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8123 3552 3553 3923 10350 ];
+  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8181 8123 3552 3553 3923 10350 ];
   networking.firewall.allowedUDPPorts = [ 53 22 ];
   # Or to disable the firewall altogether, uncomment the below !
   # networking.firewall.enable = false;
- 
-  
+   
   # Below are services and app configs for nix modules,
   # things that would normally be in docker compose basically.
   
-  # Pihole Config
-
+  # Pihole config
   services.pihole-ftl = {
   enable = true;
- 
   lists = [
       {
         type = "block";
@@ -218,24 +215,21 @@
         description = "Default StevenBlack Adlist";
       }
     ];
-
   settings = {
     dns.upstreams = [ "8.8.8.8" "1.1.1.1" ];  # Example DNS servers
     # dns.hosts = [ "192.168.1.188 hostname.domain" ];  # Local host resolution
 
     # Be sure to run "pihole setpassword" on a new host machine, otherwise pihole will be passwordless
     # Maybe ill try to delcaritevly set a password in the config file but i dont feel like it rn
-
     dns = {
       listeningMode = "ALL"; # This is "Permit all origins"
-
+      
       # Syntax: "true,IP Range,MagicDNS Server,Tailnet Domain". Conditional Forwarding rule, useful for adblock across a tailnet
       revServers = [
         # Uncomment the below and replace the tailnet name with a real one
         "true,100.64.0.0/10,100.100.100.100,bun-pride.ts.net"
        ];
       };
-
     misc.readOnly = false;
     misc.etc_dnsmasq_d = true;
 
@@ -255,9 +249,8 @@
     enable = true;
     ports = [ "8080" ];
 };
-
   # Copyparty Config
-
+   
     services.copyparty = {
       enable = true;
       user = "ashi";
@@ -268,7 +261,6 @@
         no-reload = true; 
         ignored-flag = false; 
       };
-
     accounts = {
       ashi = {
         passwordFile = "/var/lib/copyparty/secret";
@@ -278,7 +270,6 @@
         # then run this to make a password "echo "your_password_here" | sudo tee /var/lib/copyparty/secret > /dev/null"
       };
     };
-
     volumes = {
       "/home" = {
         path = "/home/ashi";
@@ -291,15 +282,12 @@
       };
     };
   };
-
   # Vaultwarden Config
 
   services.vaultwarden = {
-
   enable = true;
   environmentFile = "/var/lib/vaultwarden.env";  #ADMIN_TOKEN is stored in here!!
   # if this file doesnt exist then create it and put admin token inside, be sure file permissions are right and its owned by user vaultwarden and group vaultwarden 
-  
   config = {
       DATA_FOLDER = "/DATA/AppData/vaultwarden";
       ROCKET_PORT = 10350;
@@ -307,19 +295,26 @@
       WEBSOCKET_ENABLED = true;
       SIGNUPS_ALLOWED = true;
    # DOMAIN = "";
+     };
    };
-
-   };
-
-
   # Force systemd sandboxing rules to allow the custom path
   systemd.services.vaultwarden.serviceConfig = {
   ReadWritePaths = [ "/DATA/AppData/vaultwarden" ];
-    
   # Use mkForce to override the default 'true' setting safely
   ProtectHome = lib.mkForce "tmpfs"; 
   };
-    
+  # Microbin Config
+  
+  services.microbin = {
+    enable = true;
+    # passwordFile = "/var/lib/microbinEnv";
+    settings = {
+      MICROBIN_BIND = "0.0.0.0";
+      MICROBIN_PORT = 8181;
+      MICROBIN_DISABLE_TELEMETRY = true;
+    };
+  };
+      
   # End of Nix Modules Configs !!
   
   # Some programs need SUID wrappers, can be configured further or are

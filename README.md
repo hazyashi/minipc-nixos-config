@@ -7,7 +7,7 @@ nixos config for my little hp prodesk mini pc for my homelab
 <br>
 I made this config starting first in a VM before i proceeded to spend hours configuring the system. At the moment this is a very basic config meant to run a couple self hosted services
 for my homelab on my tiny hp prodesk with 4gb of ram. <br>
-im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using Nix Modules over Docker Containers in this config where I can.
+im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using Nix Modules over Docker Containers where it makes sense to.
 <br>
 <br>
 
@@ -17,6 +17,7 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 - pihole <br>
 - copyparty <br>
 - vaultwarden <br>
+- microbin <br>
 
 ***Docker Containers***
 - arcane <br>
@@ -27,7 +28,7 @@ using config files in '/etc/nixos' and running 'nixos-rebuild switch'.
 I used compose2nix to make docker compose also able to bring up containers with a nixos-rebuild.
 <br>
 I tried using home manager but I don't have a need for it on a headless server
-where it would overcomplicate things & bloat the '/nix/store' and just make more configs to write.
-(I only barely grasp how flakes work to)
+where it would overcomplicate things & bloat the '/nix/store' and just make more configs to write
+(I only barely grasp how flakes work to).
 <br>
-If i want to back up user configs, I will make symlinks from ~/.config to a directory in this repo
+If i want to back up user configs, I will make symlinks from ~/.config to a directory in this repo.
