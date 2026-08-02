@@ -13,8 +13,15 @@
     #   url = "github:nix-community/home-manager";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+ # };
+ # outputs = { self, nixpkgs }: 
+ # let
+ #   pkgs = nixpkgs.legacyPackages.x86_64-linux;
+ # in
+ # {
+      
   };
-
+  
   outputs = { self, nixpkgs, ... }@inputs: {
     # use "nixos", or your hostname as the name of the configuration
     # it's a better practice than "default" shown in the video

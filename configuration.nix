@@ -14,37 +14,38 @@
       # Copyparty Nix Module
       ./modules/copyparty.nix
     
-      # Compose2nix Containers below
-      # Arcane
-      ./compose/arcane/docker-compose.nix
-      # Home Assistant
-      # ./compose/home-assistant/docker-compose.nix # Keeping Home Assistant commented out as i have no need for it at this moment 
+      # Compose2nix Oci.Containers below
+       ./compose/arcane/docker-compose.nix # Arcane
+       ./compose/pihole/docker-compose.nix # Pi-Hole
+      # ./compose/home-assistant/docker-compose.nix # Home Assistant #Keeping Home Assistant commented out as i have no need for it at this moment     
 
       # Keeping Home Manager commented out cause its kinda just bloat to me on a headless server
       # inputs.home-manager.nixosModules.default
      ];
 
-  # Bootloader stuff on the real hp prodesk hardware
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  
   # All this bootloader stuff down here was from when this nix config was on a VM, do NOT uncomment it
-  # Bootloader.
   # boot.loader.grub.enable = true;
   # boot.loader.grub.device = "/dev/vda"; # Change this on different host machines
   # boot.loader.grub.useOSProber = true;
 
-  networking.hostName = "wisteria"; # Define your hostname.
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
+  # Bootloader on the real HP Prodesk hardware
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  
+  services.openssh.enable = true;          # Enables OpenSSH Daemon
+  # Networking !!
+  networking.networkmanager.enable = true; # Enable networking
+  networking.hostName = "wisteria";        # Define your hostname.
+  networking.wireless.enable = true;       # Enables wireless support via wpa_supplicant.
+  # Open ports in the firewall !!
+  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8181 8123 3552 3553 3923 10350 ];
+  networking.firewall.allowedUDPPorts = [ 53 22 ];
+  # Or to disable the firewall altogether, uncomment the below !!
+  # networking.firewall.enable = false;
+ 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Optimizations for the tiny pathetic 4gb ram pc lmao
   zramSwap.enable = true;
@@ -59,18 +60,18 @@
     clean.extraArgs = "--keep-since 4d --keep 3";
     flake = "/etc/nixos"; # sets NH_OS_FLAKE variable for you
   };
-     
+  
   nix.settings = {
    cores = 2;
    max-jobs = 1;
    auto-optimise-store = true;
+   experimental-features = [ "nix-command" "flakes" ]; # Flakes confuse me 
   };
-  # Set your time zone.
-  time.timeZone = "America/Los_Angeles";
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
 
+  # Locale Settings
+  time.timeZone = "America/Los_Angeles";   # Timezone
+  i18n.defaultLocale = "en_US.UTF-8";      # Select internationalisation properties.
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
     LC_IDENTIFICATION = "en_US.UTF-8";
@@ -82,7 +83,6 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -95,16 +95,7 @@
     description = "ashi";
     shell = pkgs.bash;
     extraGroups = [ "networkmanager" "wheel" "docker" "copyparty" "vaultwarden" ];
-    packages = with pkgs; [
-    
-    btop
-    htop
-    fastfetch
-    hyfetch
-    superfile
-
-     ];
-  };
+    packages = with pkgs; [ ]; };
 
   # source ~/.bashrc on user login, no idea why its not like this by default  
      programs.bash.interactiveShellInit = ''
@@ -121,53 +112,49 @@
   #  };
   # };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
+  # System Packages !!
+  # To search, run:
   # $ nix search wget
-
-  environment.systemPackages = with pkgs; [
-  # i hate vim and im leaving it commented
-  # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-
-  # Functional system nix packages here !!
-    wget
-    kitty
-    tmux
-    starship
-    curl
-    dig
-    host
-    busybox
-    ethtool
-  # Cli's !!
-    git
-    yt-dlp
-    compose2nix
-    docker-compose
-  # Tui's !!
-    helix
-    glow
-    tray-tui
-    tuios
-  # self hosted services nix modules here !!
-    copyparty 
-    pihole-ftl
-    vaultwarden
-    microbin
-      
-];# end bracket of system packages
- 
-  # !! MAIN STUFF !!
-  # some important system stuff
-
-  services.openssh.enable = true;
+  nixpkgs.config.allowUnfree = true;          # Allow Unfree Packages
+  environment.systemPackages = with pkgs; [   # nix.pkgs below 
+  # General Nix.pkgs !!
+  kitty
+  dig
+  host
+  busybox
+  ethtool
+  # Cli Utils !!
+  git
+  wget
+  curl
+  tmux
+  starship
+  yt-dlp
+  compose2nix
+  docker-compose
+  # Tui Utils !!
+  helix
+  superfile
+  btop
+  htop
+  fastfetch
+  hyfetch
+  glow
+  tray-tui
+  tuios
+  # Self Hosted Nix.pkgs !!
+  copyparty 
+  vaultwarden
+  microbin
+  ];
+  # end bracket of system packages
+  
+  # Containers
   virtualisation.podman.dockerCompat = false;
   virtualisation.docker.enable = true;
   virtualisation.docker.enableOnBoot = true;
   
-  # tailscale config
+  # Tailscale configuration
   services.tailscale = {
       enable = true;
       useRoutingFeatures = "server";
@@ -192,63 +179,15 @@
   script = ''
     NETDEV=$(ip -o route get 8.8.8.8 | cut -f 5 -d " ")
     ethtool -K "$NETDEV" rx-udp-gro-forwarding on rx-gro-list off
-  '';
-};
-
-  # Networking here !!
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8181 8123 3552 3553 3923 10350 ];
-  networking.firewall.allowedUDPPorts = [ 53 22 ];
-  # Or to disable the firewall altogether, uncomment the below !
-  # networking.firewall.enable = false;
+    '';
+  };
    
   # Below are services and app configs for nix modules,
   # things that would normally be in docker compose basically.
+
+  # Nix Documentation sucks reminder to go to self to use
+  # https://wiki.nixos.org/wiki/NixOS_Wiki to search for module options
   
-  # Pihole config
-  services.pihole-ftl = {
-  enable = true;
-  lists = [
-      {
-        type = "block";
-        url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-        description = "Default StevenBlack Adlist";
-      }
-    ];
-  settings = {
-    dns.upstreams = [ "8.8.8.8" "1.1.1.1" ];  # Example DNS servers
-    # dns.hosts = [ "192.168.1.188 hostname.domain" ];  # Local host resolution
-
-    # Be sure to run "pihole setpassword" on a new host machine, otherwise pihole will be passwordless
-    # Maybe ill try to delcaritevly set a password in the config file but i dont feel like it rn
-    dns = {
-      listeningMode = "ALL"; # This is "Permit all origins"
-      
-      # Syntax: "true,IP Range,MagicDNS Server,Tailnet Domain". Conditional Forwarding rule, useful for adblock across a tailnet
-      revServers = [
-        # Uncomment the below and replace the tailnet name with a real one
-        "true,100.64.0.0/10,100.100.100.100,bun-pride.ts.net"
-       ];
-      };
-    misc.readOnly = false;
-    misc.etc_dnsmasq_d = true;
-
-    webserver.interface.theme = "high-contrast-dark";
-    webserver.api.app_sudo = true;
-        
-    database.maxDBdays = 30;
-    database.network.expire = 30;
-    };
-  };
-    # Pihole Password is stored in this enviroment variable, contents of it should be
-    # FTLCONF_webserver_api_password="password"
-    systemd.services.pihole-ftl.serviceConfig.EnvironmentFile = "/var/lib/pihole/pihole-secrets.env";
-    systemd.services.pihole-ftl.serviceConfig.PrivateNetwork = false;
-    
-    services.pihole-web = {
-    enable = true;
-    ports = [ "8080" ];
-};
   # Copyparty Config
    
     services.copyparty = {
@@ -286,10 +225,10 @@
 
   services.vaultwarden = {
   enable = true;
+  backupDir = "/var/local/vaultwarden/backup";
   environmentFile = "/var/lib/vaultwarden.env";  #ADMIN_TOKEN is stored in here!!
   # if this file doesnt exist then create it and put admin token inside, be sure file permissions are right and its owned by user vaultwarden and group vaultwarden 
   config = {
-      DATA_FOLDER = "/DATA/AppData/vaultwarden";
       ROCKET_PORT = 10350;
       ROCKET_ADDRESS = "0.0.0.0";
       WEBSOCKET_ENABLED = true;
@@ -297,12 +236,6 @@
    # DOMAIN = "";
      };
    };
-  # Force systemd sandboxing rules to allow the custom path
-  systemd.services.vaultwarden.serviceConfig = {
-  ReadWritePaths = [ "/DATA/AppData/vaultwarden" ];
-  # Use mkForce to override the default 'true' setting safely
-  ProtectHome = lib.mkForce "tmpfs"; 
-  };
   # Microbin Config
   
   services.microbin = {
@@ -324,8 +257,7 @@
   #   enable = true;
   #  enableSSHSupport = true;
   # };
-
-
+  
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
