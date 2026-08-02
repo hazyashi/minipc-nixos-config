@@ -14,12 +14,12 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 ### list of services (so far) 
 
  ***Nix Modules***
-- pihole <br>
 - copyparty <br>
 - vaultwarden <br>
 - microbin <br>
 
-***Docker Containers***
+***Oci Containers***
+- pihole <br>
 - arcane <br>
 - home-assistant <br>
 
