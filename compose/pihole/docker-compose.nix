@@ -22,8 +22,8 @@
       "TZ" = "America/Los_Angeles";
     };
     volumes = [
-      "/DATA/AppData/pihole-stack/pihole:/etc/pihole:rw"
-      "/DATA/AppData/pihole-stack/pihole/dnsmasq:/etc/dnsmasq.d:rw"
+      "/DATA/AppData/pihole-single/pihole:/etc/pihole:rw"
+      "/DATA/AppData/pihole-single/pihole/dnsmasq:/etc/dnsmasq.d:rw"
     ];
     log-driver = "journald";
     extraOptions = [

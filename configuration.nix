@@ -38,7 +38,7 @@
   networking.hostName = "wisteria";        # Define your hostname.
   networking.wireless.enable = true;       # Enables wireless support via wpa_supplicant.
   # Open ports in the firewall !!
-  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8181 8123 3552 3553 3923 10350 ];
+  networking.firewall.allowedTCPPorts = [ 53 22 80 443 8080 8181 8123 9090 3552 3553 3923 10350 ];
   networking.firewall.allowedUDPPorts = [ 53 22 ];
   # Or to disable the firewall altogether, uncomment the below !!
   # networking.firewall.enable = false;
@@ -146,6 +146,7 @@
   copyparty 
   vaultwarden
   microbin
+  gitea
   ];
   # end bracket of system packages
   
@@ -162,7 +163,7 @@
       extraUpFlags = [
          "--accept-routes=true"
          "--ssh=true"
-         "--accept-dns=true"
+         "--accept-dns=false"
       ];
     };
   # Tailscale Subnet Routing Optimizations here
@@ -186,7 +187,9 @@
   # things that would normally be in docker compose basically.
 
   # Nix Documentation sucks reminder to go to self to use
-  # https://wiki.nixos.org/wiki/NixOS_Wiki to search for module options
+  # https://wiki.nixos.org/wiki/NixOS_Wiki
+  # https://search.nixos.org/options?channel=26.05&type=options
+  #  to search for module options
   
   # Copyparty Config
    
@@ -233,7 +236,7 @@
       ROCKET_ADDRESS = "0.0.0.0";
       WEBSOCKET_ENABLED = true;
       SIGNUPS_ALLOWED = true;
-   # DOMAIN = "";
+      # DOMAIN = "";
      };
    };
   # Microbin Config
@@ -247,7 +250,23 @@
       MICROBIN_DISABLE_TELEMETRY = true;
     };
   };
-      
+  # Gitea Config
+  services.gitea = {
+    enable = true;
+    appName = "wistea";
+    database.type = "sqlite3";
+    settings = {
+      service.DISABLE_REGISTRATION = false;
+      security.PASSWORD_HASH_ALGO = "pbkdf2";
+      lfs.START_SERVER = "false";
+      packages.ENABLED = "false";
+      server = {
+        HTTP_ADDR = "0.0.0.0";
+        HTTP_PORT = 9090;
+        };
+      };
+     };
+
   # End of Nix Modules Configs !!
   
   # Some programs need SUID wrappers, can be configured further or are
