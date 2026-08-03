@@ -13,10 +13,11 @@ im using NixOS to replace Ubuntu server on the PC. Also Experimenting with using
 
 ### list of services (so far) 
 
- ***Nix Modules***
+ ***Nix Pkgs***
 - copyparty <br>
 - vaultwarden <br>
 - microbin <br>
+- gitea <br>
 
 ***Oci Containers***
 - pihole <br>
