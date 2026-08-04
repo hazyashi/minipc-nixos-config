@@ -4,8 +4,7 @@
 
 # larping i got no idea what im doing help
 
-{ config, pkgs, inputs, lib, ... }: {
-
+{ config, pkgs, lib, ... }: {
   imports =
     [ # Include the results of the hardware scan.
       # make sure to use .gitignore on this when transfering /etc/nixos to other machines
@@ -68,6 +67,12 @@
    experimental-features = [ "nix-command" "flakes" ]; # Flakes confuse me 
   };
 
+  services.journald.extraConfig = ''
+  RuntimeMaxUse=32M
+  SystemMaxUse=64M
+  MaxRetentionSec=1week
+  Storage=volatile
+  '';
 
   # Locale Settings
   time.timeZone = "America/Los_Angeles";   # Timezone
@@ -151,10 +156,19 @@
   # end bracket of system packages
   
   # Containers
-  virtualisation.podman.dockerCompat = false;
-  virtualisation.docker.enable = true;
-  virtualisation.docker.enableOnBoot = true;
-  
+  virtualisation = {
+    containers.enable = true;
+    podman = {
+      enable = true;
+      dockerSocket.enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
+    docker = {
+    enable = false;
+    enableOnBoot = false;
+   };
+  };
   # Tailscale configuration
   services.tailscale = {
       enable = true;
@@ -186,7 +200,7 @@
   # Below are services and app configs for nix modules,
   # things that would normally be in docker compose basically.
 
-  # Nix Documentation sucks reminder to go to self to use
+  # Nix Documentation sucks reminder to self to use
   # https://wiki.nixos.org/wiki/NixOS_Wiki
   # https://search.nixos.org/options?channel=26.05&type=options
   #  to search for module options
@@ -266,8 +280,7 @@
         };
       };
      };
-
-  # End of Nix Modules Configs !!
+ # End of Nix Modules Configs !!
   
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -284,5 +297,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "26.05"; # Did you read the comment?
-
 }
